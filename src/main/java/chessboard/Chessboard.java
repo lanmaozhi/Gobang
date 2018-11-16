@@ -1,5 +1,7 @@
 package chessboard;
 
+import utils.ChessTypeEnum;
+
 /**
  * <pre>
  *
@@ -24,4 +26,13 @@ public interface Chessboard {
      * 是否已结束
      */
     int judgeIsComplete();
+
+    /**
+     * 走棋(x, y)
+     * @param chessType 棋子类型
+     * @param x 走子横坐标
+     * @param y 走子纵坐标
+     * @return 是否成功
+     */
+    boolean makeAMove(ChessTypeEnum chessType, int x, int y);
 }

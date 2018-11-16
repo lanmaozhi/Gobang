@@ -1,5 +1,9 @@
 package utils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * <pre>
  *
@@ -15,7 +19,12 @@ package utils;
  */
 public class Constants {
 
-    public static final int BLACK = 1;
-    public static final int WRITE = 2;
-    public static final int NONE  = 0;
+    //行数、列数、对角线数
+    public static final int ROW_NUM = 15;
+    public static final int COLUMN_NUM = 15;
+    public static final int CROSS_NUM  = 29;
+
+    //掩码列表
+    public static List<Integer> MASK_CODES = Collections.unmodifiableList(Arrays.asList(0x8000, 0x4000, 0x2000, 0x1000
+            , 0x0800, 0x0400, 0x0200, 0x0100, 0x0080, 0x0040, 0x0020, 0x0010, 0x0008, 0x0004, 0x0002));
 }
