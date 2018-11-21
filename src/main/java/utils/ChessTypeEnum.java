@@ -16,7 +16,7 @@ package utils;
 public enum ChessTypeEnum {
 
     BLACK(0),
-    WRITE(1);
+    WHITE(1);
 
     //棋子数组下标
     private int arrayIndex;
