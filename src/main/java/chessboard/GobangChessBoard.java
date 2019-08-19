@@ -86,7 +86,7 @@ public class GobangChessBoard implements Chessboard {
 
         //走棋
         if (this.useBitMap) {
-            this.makeAMoveToBitMap(this.rows[chessType.getChessArrayIndex()], this.columns[chessType.getChessArrayIndex()], this.leftCrosses[chessType.getChessArrayIndex()], this.rightCrosses[chessType.getChessArrayIndex()], x, y);
+            this.makeAMoveToBitMap(this.rows[chessType.index], this.columns[chessType.index], this.leftCrosses[chessType.index], this.rightCrosses[chessType.index], x, y);
         }
 
         //放入位置set内

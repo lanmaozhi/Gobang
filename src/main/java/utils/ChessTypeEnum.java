@@ -19,13 +19,9 @@ public enum ChessTypeEnum {
     WHITE(1);
 
     //棋子数组下标
-    private int arrayIndex;
+    public int index;
 
-    ChessTypeEnum(int arrayIndex) {
-        this.arrayIndex = arrayIndex;
-    }
-
-    public int getChessArrayIndex() {
-        return this.arrayIndex;
+    ChessTypeEnum(int index) {
+        this.index = index;
     }
 }
