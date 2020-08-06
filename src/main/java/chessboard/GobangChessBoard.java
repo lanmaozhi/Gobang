@@ -10,7 +10,7 @@ import static utils.Constants.MASK_CODES;
 
 public class GobangChessBoard implements Chessboard {
 
-    //棋子行、列、左斜对角线、右斜对角线
+    //棋子行、列、左下-右上、右上-左下
     private final int[][] rows;
     private final int[][] columns;
     private final int[][] leftCrosses;
@@ -81,31 +81,3 @@ public class GobangChessBoard implements Chessboard {
                 || (rows[ChessTypeEnum.WHITE.index][x] & MASK_CODES[y]) != 0;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
