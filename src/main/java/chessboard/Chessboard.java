@@ -1,5 +1,6 @@
 package chessboard;
 
+import model.PatternMetaData;
 import utils.ChessTypeEnum;
 
 public interface Chessboard {
@@ -15,7 +16,12 @@ public interface Chessboard {
      * @param chessType 棋子类型
      * @param x 走子横坐标
      * @param y 走子纵坐标
-     * @return 是否成功
+     * @return 走完后是否胜利
      */
     boolean makeAMove(ChessTypeEnum chessType, int x, int y);
+
+    /**
+     * 获取棋形元数据
+     */
+    PatternMetaData getPatternMetaData();
 }
