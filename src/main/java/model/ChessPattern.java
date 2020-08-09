@@ -19,14 +19,6 @@ public class ChessPattern {
      * 起始点y
      */
     private int begY;
-    /**
-     * 终止点x
-     */
-    private int endX;
-    /**
-     * 终止点y
-     */
-    private int endY;
 
     public ChessPatternEnum getChessPattern() {
         return chessPattern;
@@ -50,21 +42,5 @@ public class ChessPattern {
 
     public void setBegY(int begY) {
         this.begY = begY;
-    }
-
-    public int getEndX() {
-        return endX;
-    }
-
-    public void setEndX(int endX) {
-        this.endX = endX;
-    }
-
-    public int getEndY() {
-        return endY;
-    }
-
-    public void setEndY(int endY) {
-        this.endY = endY;
     }
 }
