@@ -1,7 +1,6 @@
 package chessboard;
 
 import model.PatternMetaData;
-import utils.ChessPatternEnum;
 import utils.ChessTypeEnum;
 import utils.Constants;
 
@@ -14,8 +13,9 @@ import static utils.Constants.RIGHT_CROSS_PLACE;
 
 /**
  * bitmap 棋盘实现
+ * 非线程安全，不要并发访问
  */
-public class BitmapChessBoard implements Chessboard {
+public class BitmapChessBoard implements Chessboard, Cloneable {
 
     //棋子行、列、左下-右上、右上-左下
     private final int[][] rows;
@@ -27,40 +27,42 @@ public class BitmapChessBoard implements Chessboard {
     private ChessTypeEnum winSide;
 
     public BitmapChessBoard() {
-        rows = new int[ChessPatternEnum.values().length][ROW_NUM];
-        columns = new int[ChessPatternEnum.values().length][COLUMN_NUM];
-        leftCrosses = new int[ChessPatternEnum.values().length][CROSS_NUM];
-        rightCrosses = new int[ChessPatternEnum.values().length][CROSS_NUM];
+        rows = new int[ChessTypeEnum.values().length][ROW_NUM];
+        columns = new int[ChessTypeEnum.values().length][COLUMN_NUM];
+        leftCrosses = new int[ChessTypeEnum.values().length][CROSS_NUM];
+        rightCrosses = new int[ChessTypeEnum.values().length][CROSS_NUM];
 
-        //初始化空白棋盘，在初始对时候，棋盘内格子对应bit是0(代表可以下子)，棋盘外格子是1(代表此地方不能下子)
-        //行列 ~ 0111 1111 1111 1111 0000 0000 0000 0000
-        int rowBlankFlag = ~ 0x7FFF0000;
-        for (int i = 0; i < rows[ChessPatternEnum.BLANK.index].length; i++) {
-            rows[ChessPatternEnum.BLANK.index][i] = rowBlankFlag;
-        }
-        for (int i = 0; i < columns[ChessPatternEnum.BLANK.index].length; i++) {
-            columns[ChessPatternEnum.BLANK.index][i] = rowBlankFlag;
-        }
-        //斜线 0100 0000 0000 0000 0000 0000 0000 0000，0-14行可放棋子数逐渐增多，15-28行棋子逐渐减少
-        int crossFlag = 0x40000000;
-        for (int i = 0; i <= 14; i++) {
-            leftCrosses[ChessPatternEnum.BLANK.index][i] = ~ crossFlag;
-            crossFlag |= (crossFlag >>> 1);
-        }
-        crossFlag = 0x40000000;
-        for (int i = 28; i >= 15; i--) {
-            leftCrosses[ChessPatternEnum.BLANK.index][i] = ~ crossFlag;
-            crossFlag |= (crossFlag >>> 1);
-        }
-        crossFlag = 0x40000000;
-        for (int i = 0; i <= 14; i++) {
-            rightCrosses[ChessPatternEnum.BLANK.index][i] = ~ crossFlag;
-            crossFlag |= (crossFlag >>> 1);
-        }
-        crossFlag = 0x40000000;
-        for (int i = 28; i >= 15; i--) {
-            rightCrosses[ChessPatternEnum.BLANK.index][i] = ~ crossFlag;
-            crossFlag |= (crossFlag >>> 1);
+        for (ChessTypeEnum chessType : ChessTypeEnum.values()) {
+            //初始化棋盘，可以下子的点为0，不可下子(超出棋盘/已经下同色子)的点为1，黑白两个棋互不干扰，不考虑对方
+            //行列 ~ 0111 1111 1111 1111 0000 0000 0000 0000
+            int rowBlankFlag = ~ 0x7FFF0000;
+            for (int i = 0; i < rows[chessType.index].length; i++) {
+                rows[chessType.index][i] = rowBlankFlag;
+            }
+            for (int i = 0; i < columns[chessType.index].length; i++) {
+                columns[chessType.index][i] = rowBlankFlag;
+            }
+            //斜线 0100 0000 0000 0000 0000 0000 0000 0000，0-14行可放棋子数逐渐增多，15-28行棋子逐渐减少
+            int crossFlag = 0x40000000;
+            for (int i = 0; i <= 14; i++) {
+                leftCrosses[chessType.index][i] = ~ crossFlag;
+                crossFlag |= (crossFlag >>> 1);
+            }
+            crossFlag = 0x40000000;
+            for (int i = 28; i >= 15; i--) {
+                leftCrosses[chessType.index][i] = ~ crossFlag;
+                crossFlag |= (crossFlag >>> 1);
+            }
+            crossFlag = 0x40000000;
+            for (int i = 0; i <= 14; i++) {
+                rightCrosses[chessType.index][i] = ~ crossFlag;
+                crossFlag |= (crossFlag >>> 1);
+            }
+            crossFlag = 0x40000000;
+            for (int i = 28; i >= 15; i--) {
+                rightCrosses[chessType.index][i] = ~ crossFlag;
+                crossFlag |= (crossFlag >>> 1);
+            }
         }
     }
 
@@ -101,7 +103,7 @@ public class BitmapChessBoard implements Chessboard {
     }
 
     @Override
-    public synchronized boolean makeAMove(ChessTypeEnum chessType, int x, int y) {
+    public boolean makeAMove(ChessTypeEnum chessType, int x, int y) {
 
         if (chessType == null) {
             throw new RuntimeException("无传入棋子类型");
@@ -135,16 +137,6 @@ public class BitmapChessBoard implements Chessboard {
         leftCrosses[chessType.index][LEFT_CROSS_PLACE[x][y][0]] |= MASK_CODES[LEFT_CROSS_PLACE[x][y][1]];
         //右上-左下
         rightCrosses[chessType.index][RIGHT_CROSS_PLACE[x][y][0]] |= MASK_CODES[RIGHT_CROSS_PLACE[x][y][1]];
-
-        //在空白棋盘上下子
-        //行
-        rows[ChessTypeEnum.BLACK.index][x] |= MASK_CODES[y];
-        //列
-        columns[ChessTypeEnum.BLACK.index][y] |= MASK_CODES[x];
-        //左下-右上
-        leftCrosses[ChessTypeEnum.BLACK.index][LEFT_CROSS_PLACE[x][y][0]] |= MASK_CODES[LEFT_CROSS_PLACE[x][y][1]];
-        //右上-左下
-        rightCrosses[ChessTypeEnum.BLACK.index][RIGHT_CROSS_PLACE[x][y][0]] |= MASK_CODES[RIGHT_CROSS_PLACE[x][y][1]];
     }
 
     //判断位置(x,y)上是否有棋子
@@ -152,6 +144,21 @@ public class BitmapChessBoard implements Chessboard {
 
         return (rows[ChessTypeEnum.BLACK.index][x] & MASK_CODES[y]) != 0
                 || (rows[ChessTypeEnum.WHITE.index][x] & MASK_CODES[y]) != 0;
+    }
+
+    @Override
+    public void unMove(int x, int y) {
+
+        for (ChessTypeEnum chessType : ChessTypeEnum.values()) {
+            //行
+            rows[chessType.index][x] &= ~ MASK_CODES[y];
+            //列
+            columns[chessType.index][y] &= ~ MASK_CODES[x];
+            //左下-右上
+            leftCrosses[chessType.index][LEFT_CROSS_PLACE[x][y][0]] &= ~ MASK_CODES[LEFT_CROSS_PLACE[x][y][1]];
+            //右上-左下
+            rightCrosses[chessType.index][RIGHT_CROSS_PLACE[x][y][0]] &= ~ MASK_CODES[RIGHT_CROSS_PLACE[x][y][1]];
+        }
     }
 
     @Override

@@ -5,7 +5,9 @@ package utils;
  */
 public enum ChessTypeEnum {
 
+    //黑子
     BLACK(0),
+    //白子
     WHITE(1);
 
     //棋子数组下标

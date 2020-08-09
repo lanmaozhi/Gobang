@@ -21,6 +21,11 @@ public interface Chessboard {
     boolean makeAMove(ChessTypeEnum chessType, int x, int y);
 
     /**
+     * 取消走棋
+     */
+    void unMove(int x, int y);
+
+    /**
      * 获取棋形元数据
      */
     PatternMetaData getPatternMetaData();
