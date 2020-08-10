@@ -1,8 +1,11 @@
 package chessboard;
 
+import model.ChessPattern;
 import model.PatternMetaData;
 import utils.ChessTypeEnum;
 import utils.Constants;
+
+import java.util.List;
 
 import static utils.Constants.ROW_NUM;
 import static utils.Constants.COLUMN_NUM;
@@ -31,39 +34,6 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         columns = new int[ChessTypeEnum.values().length][COLUMN_NUM];
         leftCrosses = new int[ChessTypeEnum.values().length][CROSS_NUM];
         rightCrosses = new int[ChessTypeEnum.values().length][CROSS_NUM];
-
-        for (ChessTypeEnum chessType : ChessTypeEnum.values()) {
-            //初始化棋盘，可以下子的点为0，不可下子(超出棋盘/已经下同色子)的点为1，黑白两个棋互不干扰，不考虑对方
-            //行列 ~ 0111 1111 1111 1111 0000 0000 0000 0000
-            int rowBlankFlag = ~ 0x7FFF0000;
-            for (int i = 0; i < rows[chessType.index].length; i++) {
-                rows[chessType.index][i] = rowBlankFlag;
-            }
-            for (int i = 0; i < columns[chessType.index].length; i++) {
-                columns[chessType.index][i] = rowBlankFlag;
-            }
-            //斜线 0100 0000 0000 0000 0000 0000 0000 0000，0-14行可放棋子数逐渐增多，15-28行棋子逐渐减少
-            int crossFlag = 0x40000000;
-            for (int i = 0; i <= 14; i++) {
-                leftCrosses[chessType.index][i] = ~ crossFlag;
-                crossFlag |= (crossFlag >>> 1);
-            }
-            crossFlag = 0x40000000;
-            for (int i = 28; i >= 15; i--) {
-                leftCrosses[chessType.index][i] = ~ crossFlag;
-                crossFlag |= (crossFlag >>> 1);
-            }
-            crossFlag = 0x40000000;
-            for (int i = 0; i <= 14; i++) {
-                rightCrosses[chessType.index][i] = ~ crossFlag;
-                crossFlag |= (crossFlag >>> 1);
-            }
-            crossFlag = 0x40000000;
-            for (int i = 28; i >= 15; i--) {
-                rightCrosses[chessType.index][i] = ~ crossFlag;
-                crossFlag |= (crossFlag >>> 1);
-            }
-        }
     }
 
     @Override
@@ -167,13 +137,26 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
 
 
 
+        return null;
+    }
 
+    //获取行、列位置的元数据信息
+    public List<ChessPattern> getRowColumnPattenMetaData(int[][] mainRows, int[][] otherRows) {
 
+        int fiveBitLength = 0xF8000000;
+        int sixBitLength = 0xFC000000;
+        for (int i = 0; i < mainRows.length; i++) {
 
+        }
 
         return null;
     }
 
+    //获取对角线位置的元数据信息
+    public List<ChessPattern> getCrossPattenMetaData(int[][] mainCrosses, int[][] otherCrosses) {
+
+        return null;
+    }
 
 
 
