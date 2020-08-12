@@ -2,6 +2,7 @@ package chessboard;
 
 import model.ChessPattern;
 import model.PatternMetaData;
+import utils.ChessPatternEnum;
 import utils.ChessTypeEnum;
 import utils.Constants;
 
@@ -134,26 +135,39 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
     @Override
     public PatternMetaData getPatternMetaData() {
 
+        PatternMetaData patternMetaData = new PatternMetaData();
+        patternMetaData.setBlackRowPatterns(getRowColumnPattenMetaData(rows[ChessTypeEnum.BLACK.index], rows[ChessTypeEnum.WHITE.index]));
+        patternMetaData.setBlackColumnPatterns(getRowColumnPattenMetaData(columns[ChessTypeEnum.BLACK.index], columns[ChessTypeEnum.WHITE.index]));
+        patternMetaData.setBlackLeftCrossPatterns(getCrossPattenMetaData(leftCrosses[ChessTypeEnum.BLACK.index], leftCrosses[ChessTypeEnum.WHITE.index]));
+        patternMetaData.setBlackRightCrossPatterns(getCrossPattenMetaData(rightCrosses[ChessTypeEnum.BLACK.index], rightCrosses[ChessTypeEnum.WHITE.index]));
+        patternMetaData.setWhiteRowPatterns(getRowColumnPattenMetaData(rows[ChessTypeEnum.WHITE.index], rows[ChessTypeEnum.BLACK.index]));
+        patternMetaData.setWhiteColumnPatterns(getRowColumnPattenMetaData(columns[ChessTypeEnum.WHITE.index], columns[ChessTypeEnum.BLACK.index]));
+        patternMetaData.setWhiteLeftCrossPatterns(getCrossPattenMetaData(leftCrosses[ChessTypeEnum.WHITE.index], leftCrosses[ChessTypeEnum.BLACK.index]));
+        patternMetaData.setWhiteRightCrossPatterns(getCrossPattenMetaData(rightCrosses[ChessTypeEnum.WHITE.index], rightCrosses[ChessTypeEnum.BLACK.index]));
 
-
-
-        return null;
+        return patternMetaData;
     }
 
     //获取行、列位置的元数据信息
-    public List<ChessPattern> getRowColumnPattenMetaData(int[][] mainRows, int[][] otherRows) {
+    public List<ChessPattern> getRowColumnPattenMetaData(int[] mainRows, int[] otherRows) {
 
         int fiveBitLength = 0xF8000000;
         int sixBitLength = 0xFC000000;
         for (int i = 0; i < mainRows.length; i++) {
-
+            int mainRow = mainRows[i];
+            int otherRow = otherRows[i];
+            for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
+                if ((mainRow & patternEnum.pattern) != patternEnum.pattern) {
+                    continue;
+                }
+            }
         }
 
         return null;
     }
 
     //获取对角线位置的元数据信息
-    public List<ChessPattern> getCrossPattenMetaData(int[][] mainCrosses, int[][] otherCrosses) {
+    public List<ChessPattern> getCrossPattenMetaData(int[] mainCrosses, int[] otherCrosses) {
 
         return null;
     }
