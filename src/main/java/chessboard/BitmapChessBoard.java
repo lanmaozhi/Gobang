@@ -6,6 +6,7 @@ import utils.ChessPatternEnum;
 import utils.ChessTypeEnum;
 import utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static utils.Constants.ROW_NUM;
@@ -149,36 +150,110 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
     }
 
     //获取行、列位置的元数据信息
-    public List<ChessPattern> getRowColumnPattenMetaData(int[] mainRows, int[] otherRows) {
+    private List<ChessPattern> getRowColumnPattenMetaData(int[] mainRows, int[] otherRows) {
 
-        int fiveBitLength = 0xF8000000;
-        int sixBitLength = 0xFC000000;
+        List<ChessPattern> chessPatterns = new ArrayList<>();
+        //由于有六连，所以只循环 Constants.COLUMN_NUM - 5 次
+        int rowLoopTimes = Constants.COLUMN_NUM - 5;
         for (int i = 0; i < mainRows.length; i++) {
             int mainRow = mainRows[i];
             int otherRow = otherRows[i];
+            for (int j = 0; j < rowLoopTimes; j++) {
+                for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
+                    if ((mainRow & patternEnum.pattern) == patternEnum.pattern
+                            && (otherRow & patternEnum.limitMask) == 0) {
+                        chessPatterns.add(new ChessPattern(patternEnum, i, j));
+                    }
+                    mainRow <<= 1;
+                    otherRow <<= 1;
+                }
+            }
+            //判断末尾的五连信息
             for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
-                if ((mainRow & patternEnum.pattern) != patternEnum.pattern) {
-                    continue;
+                if (patternEnum.bitLength == 5 && (mainRow & patternEnum.pattern) == patternEnum.pattern
+                        && (otherRow & patternEnum.limitMask) == 0) {
+                    chessPatterns.add(new ChessPattern(patternEnum, i, rowLoopTimes));
                 }
             }
         }
 
-        return null;
+        return chessPatterns;
     }
 
     //获取对角线位置的元数据信息
-    public List<ChessPattern> getCrossPattenMetaData(int[] mainCrosses, int[] otherCrosses) {
+    private List<ChessPattern> getCrossPattenMetaData(int[] mainCrosses, int[] otherCrosses) {
 
-        return null;
+        List<ChessPattern> chessPatterns = new ArrayList<>();
+        for (int i = 0; i < mainCrosses.length; i++) {
+            //
+            int rowLength = i <= 14 ? i + 1 : 29 - i;
+            //
+            int rowLoopTimes = rowLength - 5;
+            if (rowLoopTimes < 0) {
+                continue;
+            }
+            int mainRow = mainCrosses[i];
+            int otherRow = otherCrosses[i];
+            for (int j = 0; j < rowLoopTimes; j++) {
+                for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
+                    if ((mainRow & patternEnum.pattern) == patternEnum.pattern
+                            && (otherRow & patternEnum.limitMask) == 0) {
+                        chessPatterns.add(new ChessPattern(patternEnum, i, j));
+                    }
+                    mainRow <<= 1;
+                    otherRow <<= 1;
+                }
+            }
+            //判断末尾的五连信息
+            for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
+                if (patternEnum.bitLength == 5 && (mainRow & patternEnum.pattern) == patternEnum.pattern
+                        && (otherRow & patternEnum.limitMask) == 0) {
+                    chessPatterns.add(new ChessPattern(patternEnum, i, rowLoopTimes));
+                }
+            }
+        }
+
+        return chessPatterns;
     }
 
+    @Override
+    public void printChessboard() {
 
+        String[] board = new String[] {
+                "┏┳┳┳┳┳┳┳┳┳┳┳┳┳┓",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┣╋╋╋╋╋╋╋╋╋╋╋╋╋┫",
+                "┗┻┻┻┻┻┻┻┻┻┻┻┻┻┛"
+        };
 
-
-
-
-
-
+        System.out.println(" abcdefghijklmno");
+        for (int i = 0; i < Constants.COLUMN_NUM; i++) {
+            System.out.print((char) (i + 'A'));
+            for (int j = 0; j < Constants.COLUMN_NUM; j++) {
+                if ((rows[ChessTypeEnum.BLACK.index][i] & MASK_CODES[j]) != 0) {
+                    System.out.print('●');
+                }
+                else if ((rows[ChessTypeEnum.WHITE.index][i] & MASK_CODES[j]) != 0) {
+                    System.out.print('○');
+                }
+                else {
+                    System.out.print(board[i].charAt(j));
+                }
+            }
+            System.out.println();
+        }
+    }
 
     public static void main(String[] args) {
 
@@ -188,6 +263,7 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 12);
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 11);
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 10);
+        board1.printChessboard();
 
         BitmapChessBoard board2 = new BitmapChessBoard();
         board2.makeAMove(ChessTypeEnum.WHITE, 1, 1);
@@ -195,6 +271,7 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         board2.makeAMove(ChessTypeEnum.WHITE, 3, 3);
         board2.makeAMove(ChessTypeEnum.WHITE, 4, 4);
         board2.makeAMove(ChessTypeEnum.WHITE, 5, 5);
+        board2.printChessboard();
 
         return;
     }

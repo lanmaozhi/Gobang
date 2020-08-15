@@ -29,4 +29,9 @@ public interface Chessboard {
      * 获取棋形元数据
      */
     PatternMetaData getPatternMetaData();
+
+    /**
+     * 打印棋盘
+     */
+    void printChessboard();
 }

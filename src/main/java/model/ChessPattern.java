@@ -7,6 +7,12 @@ import utils.ChessPatternEnum;
  */
 public class ChessPattern {
 
+    public ChessPattern(ChessPatternEnum chessPattern, int begX, int begY) {
+        this.chessPattern = chessPattern;
+        this.begX = begX;
+        this.begY = begY;
+    }
+
     /**
      * 棋形
      */
