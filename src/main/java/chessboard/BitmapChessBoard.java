@@ -157,20 +157,24 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         int rowLoopTimes = Constants.COLUMN_NUM - 5;
         for (int i = 0; i < mainRows.length; i++) {
             int mainRow = mainRows[i];
+            if (mainRow == 0) {
+                continue;
+            }
             int otherRow = otherRows[i];
             for (int j = 0; j < rowLoopTimes; j++) {
                 for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
-                    if ((mainRow & patternEnum.pattern) == patternEnum.pattern
+                    if ((mainRow & patternEnum.limitMask) == patternEnum.pattern
                             && (otherRow & patternEnum.limitMask) == 0) {
                         chessPatterns.add(new ChessPattern(patternEnum, i, j));
+                        break;
                     }
-                    mainRow <<= 1;
-                    otherRow <<= 1;
                 }
+                mainRow <<= 1;
+                otherRow <<= 1;
             }
-            //判断末尾的五连信息
+            //判断末尾的五个棋子信息
             for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
-                if (patternEnum.bitLength == 5 && (mainRow & patternEnum.pattern) == patternEnum.pattern
+                if (patternEnum.bitLength == 5 && (mainRow & patternEnum.limitMask) == patternEnum.pattern
                         && (otherRow & patternEnum.limitMask) == 0) {
                     chessPatterns.add(new ChessPattern(patternEnum, i, rowLoopTimes));
                 }
@@ -193,20 +197,24 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
                 continue;
             }
             int mainRow = mainCrosses[i];
+            if (mainRow == 0) {
+                continue;
+            }
             int otherRow = otherCrosses[i];
             for (int j = 0; j < rowLoopTimes; j++) {
                 for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
-                    if ((mainRow & patternEnum.pattern) == patternEnum.pattern
+                    if ((mainRow & patternEnum.limitMask) == patternEnum.pattern
                             && (otherRow & patternEnum.limitMask) == 0) {
                         chessPatterns.add(new ChessPattern(patternEnum, i, j));
+                        break;
                     }
-                    mainRow <<= 1;
-                    otherRow <<= 1;
                 }
+                mainRow <<= 1;
+                otherRow <<= 1;
             }
-            //判断末尾的五连信息
+            //判断末尾的五个棋子信息
             for (ChessPatternEnum patternEnum :ChessPatternEnum.values()){
-                if (patternEnum.bitLength == 5 && (mainRow & patternEnum.pattern) == patternEnum.pattern
+                if (patternEnum.bitLength == 5 && (mainRow & patternEnum.limitMask) == patternEnum.pattern
                         && (otherRow & patternEnum.limitMask) == 0) {
                     chessPatterns.add(new ChessPattern(patternEnum, i, rowLoopTimes));
                 }
@@ -258,12 +266,20 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
     public static void main(String[] args) {
 
         BitmapChessBoard board1 = new BitmapChessBoard();
-        board1.makeAMove(ChessTypeEnum.BLACK, 1, 14);
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 13);
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 12);
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 11);
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 10);
         board1.printChessboard();
+        PatternMetaData patternMetaData = board1.getPatternMetaData();
+
+        BitmapChessBoard board3 = new BitmapChessBoard();
+        board3.makeAMove(ChessTypeEnum.BLACK, 1, 14);
+        board3.makeAMove(ChessTypeEnum.BLACK, 1, 13);
+        board3.makeAMove(ChessTypeEnum.BLACK, 1, 12);
+        board3.makeAMove(ChessTypeEnum.BLACK, 1, 11);
+        board3.printChessboard();
+        PatternMetaData patternMetaData1 = board3.getPatternMetaData();
 
         BitmapChessBoard board2 = new BitmapChessBoard();
         board2.makeAMove(ChessTypeEnum.WHITE, 1, 1);
@@ -272,6 +288,8 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         board2.makeAMove(ChessTypeEnum.WHITE, 4, 4);
         board2.makeAMove(ChessTypeEnum.WHITE, 5, 5);
         board2.printChessboard();
+        PatternMetaData patternMetaData2 = board2.getPatternMetaData();
+
 
         return;
     }
