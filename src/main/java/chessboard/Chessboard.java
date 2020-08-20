@@ -1,7 +1,11 @@
 package chessboard;
 
+import model.ChessPlace;
+import model.ChessRange;
 import model.PatternMetaData;
 import utils.ChessTypeEnum;
+
+import java.util.List;
 
 public interface Chessboard {
 
@@ -34,4 +38,19 @@ public interface Chessboard {
      * 打印棋盘
      */
     void printChessboard();
+
+    /**
+     * 获取当前棋盘的棋子范围，如果还没有下子，返回棋盘中心坐标
+     */
+    ChessRange getChessRange();
+
+    /**
+     * 获取范围内可以落子的棋位
+     */
+    List<ChessPlace> getBlankPlaceByRange(ChessRange chessRange);
+
+    /**
+     * 获取指定棋子的所有位置
+     */
+    List<ChessPlace> getChessPlace(ChessTypeEnum chessType);
 }

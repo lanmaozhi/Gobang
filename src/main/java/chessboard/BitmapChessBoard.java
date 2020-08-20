@@ -1,6 +1,8 @@
 package chessboard;
 
 import model.ChessPattern;
+import model.ChessPlace;
+import model.ChessRange;
 import model.PatternMetaData;
 import utils.ChessPatternEnum;
 import utils.ChessTypeEnum;
@@ -44,12 +46,16 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         return winSide;
     }
 
-    private void judgeIsComplete(ChessTypeEnum chessType) {
+    private ChessTypeEnum judgeComplete() {
 
-        if (judgeHasFiveBits(rows[chessType.index]) || judgeHasFiveBits(columns[chessType.index])
-                || judgeHasFiveBits(leftCrosses[chessType.index]) || judgeHasFiveBits(rightCrosses[chessType.index])) {
-            winSide = chessType;
+        for (ChessTypeEnum chessType : ChessTypeEnum.values()) {
+            if (judgeHasFiveBits(rows[chessType.index]) || judgeHasFiveBits(columns[chessType.index])
+                    || judgeHasFiveBits(leftCrosses[chessType.index]) || judgeHasFiveBits(rightCrosses[chessType.index])) {
+                return chessType;
+            }
         }
+
+        return null;
     }
 
     private boolean judgeHasFiveBits(int[] ints) {
@@ -94,7 +100,7 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         makeAMoveToBitMap(chessType, x, y);
 
         //计算是否胜利
-        judgeIsComplete(chessType);
+        winSide = judgeComplete();
         return winSide != null;
     }
 
@@ -131,6 +137,9 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
             //右上-左下
             rightCrosses[chessType.index][RIGHT_CROSS_PLACE[x][y][0]] &= ~ MASK_CODES[RIGHT_CROSS_PLACE[x][y][1]];
         }
+
+        //计算是否胜利
+        winSide = judgeComplete();
     }
 
     @Override
@@ -263,7 +272,78 @@ public class BitmapChessBoard implements Chessboard, Cloneable {
         }
     }
 
+    @Override
+    public ChessRange getChessRange() {
+
+        ChessRange chessRange = new ChessRange(7, 7, 7, 7);
+        for (int i = 0; i < Constants.ROW_NUM; i++) {
+            if (rows[ChessTypeEnum.BLACK.index][i] > 0 || rows[ChessTypeEnum.WHITE.index][i] > 0) {
+                chessRange.begX = i;
+                break;
+            }
+        }
+        for (int i = Constants.ROW_NUM - 1; i >= 0; i--) {
+            if (rows[ChessTypeEnum.BLACK.index][i] > 0 || rows[ChessTypeEnum.WHITE.index][i] > 0) {
+                chessRange.endX = i;
+                break;
+            }
+        }
+        for (int i = 0; i < Constants.COLUMN_NUM; i++) {
+            if (columns[ChessTypeEnum.BLACK.index][i] > 0 || columns[ChessTypeEnum.WHITE.index][i] > 0) {
+                chessRange.begY = i;
+                break;
+            }
+        }
+        for (int i = Constants.COLUMN_NUM - 1; i >= 0; i--) {
+            if (columns[ChessTypeEnum.BLACK.index][i] > 0 || columns[ChessTypeEnum.WHITE.index][i] > 0) {
+                chessRange.endY = i;
+                break;
+            }
+        }
+
+        return chessRange;
+    }
+
+    @Override
+    public List<ChessPlace> getBlankPlaceByRange(ChessRange chessRange) {
+
+        List<ChessPlace> chessPlaces = new ArrayList<>();
+        for (int i = chessRange.begX; i <= chessRange.endX; i++) {
+            for (int j = chessRange.begY; j <= chessRange.endY; j++) {
+                if (! judgePlaceHasChess(i, j)) {
+                    chessPlaces.add(new ChessPlace(i, j));
+                }
+            }
+        }
+
+        return chessPlaces;
+    }
+
+    @Override
+    public List<ChessPlace> getChessPlace(ChessTypeEnum chessType) {
+
+        List<ChessPlace> chessPlaces = new ArrayList<>();
+        for (int i = 0; i < Constants.ROW_NUM; i++) {
+            for (int j = 0; j < Constants.COLUMN_NUM; j++) {
+                if ((rows[chessType.index][i] & MASK_CODES[j]) != 0) {
+                    chessPlaces.add(new ChessPlace(i, j));
+                }
+            }
+        }
+
+        return chessPlaces;
+    }
+
     public static void main(String[] args) {
+
+        BitmapChessBoard bb = new BitmapChessBoard();
+        bb.makeAMove(ChessTypeEnum.BLACK, 5, 13);
+        bb.makeAMove(ChessTypeEnum.WHITE, 8, 11);
+        bb.unMove(5, 13);
+        ChessRange chessRange = bb.getChessRange();
+        List<ChessPlace> blankPlaceByRange = bb.getBlankPlaceByRange(chessRange);
+        List<ChessPlace> chessPlace = bb.getChessPlace(ChessTypeEnum.BLACK);
+        List<ChessPlace> chessPlace1 = bb.getChessPlace(ChessTypeEnum.WHITE);
 
         BitmapChessBoard board1 = new BitmapChessBoard();
         board1.makeAMove(ChessTypeEnum.BLACK, 1, 13);
