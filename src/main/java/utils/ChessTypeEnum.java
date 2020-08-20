@@ -16,4 +16,9 @@ public enum ChessTypeEnum {
     ChessTypeEnum(int index) {
         this.index = index;
     }
+
+    public ChessTypeEnum getAnotherType() {
+
+        return this == BLACK ? WHITE : BLACK;
+    }
 }
