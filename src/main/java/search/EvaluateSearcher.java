@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class EvaluateSearcher implements Searcher {
 
-    private static Evaluator placeEvaluator = new PlaceEvaluator();
-    private static Evaluator patternEvaluator = new PatternEvaluator();
+    private static final Evaluator placeEvaluator = new PlaceEvaluator();
+    private static final Evaluator patternEvaluator = new PatternEvaluator();
 
     @Override
     public ChessPlace search(Chessboard chessboard, ChessTypeEnum searchFor) {
